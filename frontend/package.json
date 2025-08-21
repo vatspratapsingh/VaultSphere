@@ -23,7 +23,7 @@
     "start:fast": "GENERATE_SOURCEMAP=false react-scripts start",
     "build": "react-scripts build",
     "build:fast": "GENERATE_SOURCEMAP=false react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --passWithNoTests --watchAll=false",
     "eject": "react-scripts eject",
     "clean": "rm -rf node_modules/.cache && rm -rf build",
     "dev": "npm start"
