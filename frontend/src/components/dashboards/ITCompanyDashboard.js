@@ -5,19 +5,12 @@ import {
   Building, 
   Activity, 
   Server, 
-  Shield, 
   BarChart3, 
-  Settings, 
   LogOut,
   TrendingUp,
-  AlertTriangle,
-  CheckCircle,
-  Clock,
   Code,
-  Laptop,
   Briefcase,
   DollarSign,
-  Wifi,
   AlertCircle,
   GitBranch,
   Database,
@@ -89,14 +82,7 @@ const ITCompanyDashboard = () => {
     }
   };
 
-  const getSystemStatusColor = (status) => {
-    switch (status) {
-      case 'healthy': return 'text-green-600 bg-green-100';
-      case 'warning': return 'text-yellow-600 bg-yellow-100';
-      case 'critical': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-600 bg-gray-100';
-    }
-  };
+
 
   const getProgressColor = (progress) => {
     if (progress >= 80) return 'bg-green-500';

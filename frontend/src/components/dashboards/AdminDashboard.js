@@ -1,13 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { 
   Users, 
   Building, 
   Activity, 
-  Server, 
-  Shield, 
   BarChart3, 
-  Settings, 
   LogOut,
   TrendingUp,
   AlertTriangle,
@@ -19,7 +16,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
-  const [systemStats, setSystemStats] = useState({
+  const [systemStats] = useState({
     totalTenants: 12,
     activeTenants: 11,
     systemHealth: 98,

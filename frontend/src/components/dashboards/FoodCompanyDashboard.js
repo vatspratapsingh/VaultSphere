@@ -4,15 +4,9 @@ import {
   Users, 
   Building, 
   Activity, 
-  Server, 
-  Shield, 
   BarChart3, 
-  Settings, 
   LogOut,
   TrendingUp,
-  AlertTriangle,
-  CheckCircle,
-  Clock,
   Package,
   Truck,
   ShoppingCart,
@@ -79,11 +73,7 @@ const FoodCompanyDashboard = () => {
     logout();
   };
 
-  const getStockStatus = (stock, lowStock) => {
-    if (stock <= lowStock * 0.5) return 'critical';
-    if (stock <= lowStock) return 'low';
-    return 'good';
-  };
+
 
   const getStatusColor = (status) => {
     switch (status) {
