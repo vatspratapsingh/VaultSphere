@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { 
-  Users, 
-  Building, 
   Activity, 
   BarChart3, 
   LogOut,
