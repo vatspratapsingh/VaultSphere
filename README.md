@@ -257,23 +257,11 @@ curl -X POST http://localhost:5001/api/auth/login \
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## 👨‍💻 Author
 
 **Vats Pratap Singh**
 - GitHub: [@vatspratapsingh](https://github.com/vatspratapsingh)
 - Project: VaultSphere Multi-Tenant SaaS Platform
-
-## 🙏 Acknowledgments
-
-- React team for the amazing framework
-- Express.js community for the robust backend framework
-- AWS for cloud infrastructure
-- TailwindCSS for the beautiful styling framework
-- All open-source contributors whose libraries made this possible
 
 ---
 
