@@ -10,9 +10,11 @@ const PORT = process.env.PORT || 5001;
 
 // Middleware
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://yourdomain.com'] 
-    : ['http://localhost:3000'],
+  origin: [
+    'http://localhost:3000',
+    'http://vaultsphere-frontend-2024-vats.s3-website.eu-north-1.amazonaws.com',
+    'https://vaultsphere-frontend-2024-vats.s3-website.eu-north-1.amazonaws.com'
+  ],
   credentials: true
 }));
 
@@ -29,6 +31,7 @@ app.use((req, res, next) => {
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const tenantRoutes = require('./routes/tenants');
+const taskRoutes = require('./routes/tasks');
 
 // Health check route
 app.get('/', (req, res) => {
@@ -53,6 +56,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/tenants', tenantRoutes);
+app.use('/api/tasks', taskRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -78,6 +82,7 @@ app.listen(PORT, () => {
   console.log(`🔐 Auth routes: http://localhost:${PORT}/api/auth`);
   console.log(`👥 User routes: http://localhost:${PORT}/api/users`);
   console.log(`🏢 Tenant routes: http://localhost:${PORT}/api/tenants`);
+  console.log(`📋 Task routes: http://localhost:${PORT}/api/tasks`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
 });
 

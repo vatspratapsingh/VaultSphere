@@ -184,12 +184,12 @@ const Login = () => {
 
         <div className="text-center">
           <p className="text-xs text-gray-400">
-            Demo Credentials: Use any password with these emails
+            Demo Credentials:
           </p>
           <div className="mt-2 text-xs text-gray-500 space-y-1">
-            <p>• <strong>eathealthy@gmail.com</strong> → Food Company Dashboard (Select Client Role)</p>
-            <p>• <strong>techsolutions@gmail.com</strong> → IT Solutions Dashboard (Select Client Role)</p>
-            <p>• <strong>admin@vaultsphere.com</strong> → Admin Dashboard (Select Administrator Role)</p>
+            <p>• <strong>eathealthy@gmail.com</strong> / <strong>food123</strong> → Food Company Dashboard (Select Client Role)</p>
+            <p>• <strong>techsolutions@gmail.com</strong> / <strong>tech123</strong> → IT Solutions Dashboard (Select Client Role)</p>
+            <p>• <strong>admin@vaultsphere.com</strong> / <strong>admin123</strong> → Admin Dashboard (Select Administrator Role)</p>
             <p className="mt-2 text-xs text-gray-500">Important: Select the correct role that matches your account type</p>
           </div>
         </div>

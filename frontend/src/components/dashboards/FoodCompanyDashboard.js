@@ -10,9 +10,11 @@ import {
   ShoppingCart,
   DollarSign,
   Thermometer,
-  AlertCircle
+  AlertCircle,
+  CheckSquare
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+import TasksDashboard from '../TasksDashboard';
 
 const FoodCompanyDashboard = () => {
   const { user, logout } = useAuth();
@@ -135,6 +137,7 @@ const FoodCompanyDashboard = () => {
               { id: 'overview', label: 'Overview', icon: BarChart3 },
               { id: 'inventory', label: 'Inventory', icon: Package },
               { id: 'orders', label: 'Orders', icon: ShoppingCart },
+              { id: 'tasks', label: 'Tasks', icon: CheckSquare },
               { id: 'monitoring', label: 'Monitoring', icon: Activity },
               { id: 'analytics', label: 'Analytics', icon: TrendingUp }
             ].map((tab) => (
@@ -426,6 +429,10 @@ const FoodCompanyDashboard = () => {
                </table>
              </div>
            </div>
+         )}
+
+         {activeTab === 'tasks' && (
+           <TasksDashboard />
          )}
 
          {activeTab === 'analytics' && (

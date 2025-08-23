@@ -7,6 +7,7 @@ import Signup from './components/auth/Signup';
 import AdminDashboard from './components/dashboards/AdminDashboard';
 import FoodCompanyDashboard from './components/dashboards/FoodCompanyDashboard';
 import ITCompanyDashboard from './components/dashboards/ITCompanyDashboard';
+import TasksDashboard from './components/TasksDashboard';
 import './index.css';
 
 // Protected Route Component
@@ -57,6 +58,14 @@ function App() {
                            </ProtectedRoute>
                          }
                        />
+                   <Route
+                     path="/tasks"
+                     element={
+                       <ProtectedRoute>
+                         <TasksDashboard />
+                       </ProtectedRoute>
+                     }
+                   />
                  </Routes>
         </div>
       </Router>

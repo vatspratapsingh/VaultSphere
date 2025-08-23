@@ -45,6 +45,20 @@ coverage/
 ehthumbs.db
 Thumbs.db
 
+# Terraform
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+
+# Deployment files
+backend-deploy.tar.gz
+*.log
+vaultsphere_user_accessKeys.csv
+
+# Frontend cache
+frontend/node_modules/.cache/
+
 # Database
 *.sqlite
 *.db" > .gitignore

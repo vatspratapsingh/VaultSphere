@@ -11,9 +11,11 @@ import {
   CheckCircle,
   Clock,
   Shield,
-  Server
+  Server,
+  CheckSquare
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+import TasksDashboard from '../TasksDashboard';
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
@@ -113,6 +115,7 @@ const AdminDashboard = () => {
             {[
               { id: 'overview', label: 'Overview', icon: BarChart3 },
               { id: 'tenants', label: 'Tenant Management', icon: Users },
+              { id: 'tasks', label: 'Tasks', icon: CheckSquare },
               { id: 'monitoring', label: 'System Monitoring', icon: Activity },
               { id: 'security', label: 'Security', icon: Shield }
             ].map((tab) => (
@@ -293,6 +296,10 @@ const AdminDashboard = () => {
               </table>
             </div>
           </div>
+        )}
+
+        {activeTab === 'tasks' && (
+          <TasksDashboard />
         )}
 
         {activeTab === 'monitoring' && (

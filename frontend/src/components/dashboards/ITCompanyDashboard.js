@@ -12,9 +12,11 @@ import {
   DollarSign,
   GitBranch,
   Database,
-  Cloud
+  Cloud,
+  CheckSquare
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+import TasksDashboard from '../TasksDashboard';
 
 const ITCompanyDashboard = () => {
   const { user, logout } = useAuth();
@@ -126,6 +128,7 @@ const ITCompanyDashboard = () => {
               { id: 'overview', label: 'Overview', icon: BarChart3 },
               { id: 'projects', label: 'Projects', icon: Briefcase },
               { id: 'clients', label: 'Clients', icon: Users },
+              { id: 'tasks', label: 'Tasks', icon: CheckSquare },
               { id: 'monitoring', label: 'System Monitoring', icon: Activity },
               { id: 'analytics', label: 'Analytics', icon: TrendingUp }
             ].map((tab) => (
@@ -453,6 +456,10 @@ const ITCompanyDashboard = () => {
                </div>
              </div>
            </div>
+         )}
+
+         {activeTab === 'tasks' && (
+           <TasksDashboard />
          )}
 
          {activeTab === 'analytics' && (
