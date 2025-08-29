@@ -31,7 +31,8 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password, role) => {
     try {
       // Call real backend API
-      const response = await fetch('http://localhost:5001/api/auth/login', {
+      const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -62,7 +63,8 @@ export const AuthProvider = ({ children }) => {
   const signup = async (email, password, name, tenant_id) => {
     try {
       // Call real backend API
-      const response = await fetch('http://localhost:5001/api/auth/signup', {
+      const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+      const response = await fetch(`${API_BASE_URL}/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -8,6 +8,8 @@ import AdminDashboard from './components/dashboards/AdminDashboard';
 import FoodCompanyDashboard from './components/dashboards/FoodCompanyDashboard';
 import ITCompanyDashboard from './components/dashboards/ITCompanyDashboard';
 import TasksDashboard from './components/TasksDashboard';
+import Home from './components/Home';
+import FriendsList from './components/FriendsList';
 import './index.css';
 
 // Protected Route Component
@@ -42,22 +44,30 @@ function App() {
                        </ProtectedRoute>
                      }
                    />
-                           <Route
-                         path="/food-company"
-                         element={
-                           <ProtectedRoute allowedRoles={['food']}>
-                             <FoodCompanyDashboard />
-                           </ProtectedRoute>
-                         }
-                       />
-                           <Route
-                         path="/it-company"
-                         element={
-                           <ProtectedRoute allowedRoles={['it']}>
-                             <ITCompanyDashboard />
-                           </ProtectedRoute>
-                         }
-                       />
+                   <Route
+                     path="/food-company"
+                     element={
+                       <ProtectedRoute allowedRoles={['food']}>
+                         <FoodCompanyDashboard />
+                       </ProtectedRoute>
+                     }
+                   />
+                   <Route
+                     path="/it-company"
+                     element={
+                       <ProtectedRoute allowedRoles={['it']}>
+                         <ITCompanyDashboard />
+                       </ProtectedRoute>
+                     }
+                   />
+                   <Route
+                     path="/friends"
+                     element={
+                       <ProtectedRoute>
+                         <FriendsList />
+                       </ProtectedRoute>
+                     }
+                   />
                    <Route
                      path="/tasks"
                      element={

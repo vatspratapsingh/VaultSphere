@@ -113,24 +113,21 @@ const AdminDashboard = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-8">
             {[
-              { id: 'overview', label: 'Overview', icon: BarChart3 },
-              { id: 'tenants', label: 'Tenant Management', icon: Users },
-              { id: 'tasks', label: 'Tasks', icon: CheckSquare },
-              { id: 'monitoring', label: 'System Monitoring', icon: Activity },
-              { id: 'security', label: 'Security', icon: Shield }
+              { id: 'home', label: 'Home', icon: Building, href: '/admin' },
+              { id: 'friends', label: 'Friends', icon: Users, href: '/friends' }
             ].map((tab) => (
-              <button
+              <a
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                                 className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
-                   activeTab === tab.id
-                     ? 'border-blue-400 text-blue-300'
-                     : 'border-transparent text-gray-300 hover:text-white hover:border-gray-500'
-                 }`}
+                href={tab.href}
+                className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+                  tab.id === 'home'
+                    ? 'border-blue-400 text-blue-300'
+                    : 'border-transparent text-gray-300 hover:text-white hover:border-gray-500'
+                }`}
               >
                 <tab.icon className="h-4 w-4" />
                 <span>{tab.label}</span>
-              </button>
+              </a>
             ))}
           </div>
         </div>

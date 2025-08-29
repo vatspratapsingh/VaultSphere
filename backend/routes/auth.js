@@ -21,8 +21,8 @@ router.post('/signup', async (req, res) => {
 
     // Create user
     const newUser = await db.query(
-      'INSERT INTO users (email, password, name, tenant_id) VALUES ($1, $2, $3, $4) RETURNING id, email, name, role, tenant_id',
-      [email, hashedPassword, name, tenant_id]
+      'INSERT INTO users (email, password_hash, name, role, company) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, name, role, company',
+      [email, hashedPassword, name, 'user', 'Default Company']
     );
 
     res.status(201).json({
@@ -47,7 +47,7 @@ router.post('/login', async (req, res) => {
     }
 
     // Check password
-    const isValidPassword = await bcrypt.compare(password, user.rows[0].password);
+    const isValidPassword = await bcrypt.compare(password, user.rows[0].password_hash);
     if (!isValidPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
