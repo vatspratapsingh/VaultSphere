@@ -59,7 +59,12 @@ jobs:
     name: Build & Push Docker Image (ECR)
     runs-on: ubuntu-latest
     needs: test
-    if: ${{ secrets.AWS_ACCESS_KEY_ID != '' && secrets.AWS_SECRET_ACCESS_KEY != '' && secrets.AWS_REGION != '' && secrets.ECR_REPOSITORY != '' }}
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+    if: ${{ env.AWS_ACCESS_KEY_ID != '' && env.AWS_SECRET_ACCESS_KEY != '' && env.AWS_REGION != '' && env.ECR_REPOSITORY != '' }}
     permissions:
       contents: read
       id-token: write
@@ -70,9 +75,9 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -94,29 +99,37 @@ jobs:
     name: Deploy Backend (App Runner or ECS) – optional
     runs-on: ubuntu-latest
     needs: docker
-    if: ${{ secrets.AWS_ACCESS_KEY_ID != '' && secrets.AWS_SECRET_ACCESS_KEY != '' && (secrets.APP_RUNNER_SERVICE_ARN != '' || (secrets.ECS_CLUSTER != '' && secrets.ECS_SERVICE != '')) }}
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      APP_RUNNER_SERVICE_ARN: ${{ secrets.APP_RUNNER_SERVICE_ARN }}
+      ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
+      ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
+      ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+    if: ${{ env.AWS_ACCESS_KEY_ID != '' && env.AWS_SECRET_ACCESS_KEY != '' && (env.APP_RUNNER_SERVICE_ARN != '' || (env.ECS_CLUSTER != '' && env.ECS_SERVICE != '')) }}
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Deploy to App Runner (if configured)
-        if: ${{ secrets.APP_RUNNER_SERVICE_ARN != '' }}
+        if: ${{ env.APP_RUNNER_SERVICE_ARN != '' }}
         run: |
-          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}"
+          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${ECR_REPOSITORY}:${{ github.sha }}"
           aws apprunner update-service \
-            --service-arn "${{ secrets.APP_RUNNER_SERVICE_ARN }}" \
+            --service-arn "${APP_RUNNER_SERVICE_ARN}" \
             --source-configuration ImageRepository={ImageIdentifier=$IMAGE_URI,ImageRepositoryType=ECR}
 
       - name: Force new deployment on ECS (if configured)
-        if: ${{ secrets.APP_RUNNER_SERVICE_ARN == '' && secrets.ECS_CLUSTER != '' && secrets.ECS_SERVICE != '' }}
+        if: ${{ env.APP_RUNNER_SERVICE_ARN == '' && env.ECS_CLUSTER != '' && env.ECS_SERVICE != '' }}
         run: |
           aws ecs update-service \
-            --cluster "${{ secrets.ECS_CLUSTER }}" \
-            --service "${{ secrets.ECS_SERVICE }}" \
+            --cluster "${ECS_CLUSTER}" \
+            --service "${ECS_SERVICE}}" \
             --force-new-deployment
 
 
