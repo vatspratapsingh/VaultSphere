@@ -30,12 +30,29 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run tests
+      - name: Seed test data (tenants/users)
+        if: ${{ secrets.DATABASE_URL != '' }}
         env:
-          # Provide safe defaults; override in repo or org secrets as needed
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -f create-test-accounts.js ]; then node create-test-accounts.js; else echo "no seeder present"; fi
+
+      - name: Start server in background
+        env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           NODE_ENV: test
+          PORT: 5001
+        run: |
+          nohup node server.js >/tmp/server.log 2>&1 &
+          for i in {1..30}; do curl -fsS http://localhost:5001/api/health && break || sleep 1; done
+
+      - name: Run tests
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          NODE_ENV: test
+          PORT: 5001
         run: npm test --silent
 
   docker:
