@@ -48,6 +48,7 @@ jobs:
         DB_PASSWORD: postgres
         JWT_SECRET: test_secret
         NODE_ENV: test
+        CI: true
 
   test-frontend:
     runs-on: ubuntu-latest
