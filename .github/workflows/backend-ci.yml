@@ -31,7 +31,7 @@ jobs:
         run: npm ci
 
       - name: Seed test data (tenants/users)
-        if: ${{ secrets.DATABASE_URL != '' }}
+        if: ${{ secrets.DATABASE_URL }}
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
@@ -64,7 +64,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
       ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-    if: ${{ env.AWS_ACCESS_KEY_ID != '' && env.AWS_SECRET_ACCESS_KEY != '' && env.AWS_REGION != '' && env.ECR_REPOSITORY != '' }}
+    if: ${{ secrets.AWS_ACCESS_KEY_ID && secrets.AWS_SECRET_ACCESS_KEY && secrets.AWS_REGION && secrets.ECR_REPOSITORY }}
     permissions:
       contents: read
       id-token: write
@@ -107,7 +107,7 @@ jobs:
       ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
       ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
       ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-    if: ${{ env.AWS_ACCESS_KEY_ID != '' && env.AWS_SECRET_ACCESS_KEY != '' && (env.APP_RUNNER_SERVICE_ARN != '' || (env.ECS_CLUSTER != '' && env.ECS_SERVICE != '')) }}
+    if: ${{ secrets.AWS_ACCESS_KEY_ID && secrets.AWS_SECRET_ACCESS_KEY && (secrets.APP_RUNNER_SERVICE_ARN || (secrets.ECS_CLUSTER && secrets.ECS_SERVICE)) }}
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -117,7 +117,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Deploy to App Runner (if configured)
-        if: ${{ env.APP_RUNNER_SERVICE_ARN != '' }}
+        if: ${{ secrets.APP_RUNNER_SERVICE_ARN }}
         run: |
           IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${ECR_REPOSITORY}:${{ github.sha }}"
           aws apprunner update-service \
@@ -125,7 +125,7 @@ jobs:
             --source-configuration ImageRepository={ImageIdentifier=$IMAGE_URI,ImageRepositoryType=ECR}
 
       - name: Force new deployment on ECS (if configured)
-        if: ${{ env.APP_RUNNER_SERVICE_ARN == '' && env.ECS_CLUSTER != '' && env.ECS_SERVICE != '' }}
+        if: ${{ !secrets.APP_RUNNER_SERVICE_ARN && secrets.ECS_CLUSTER && secrets.ECS_SERVICE }}
         run: |
           aws ecs update-service \
             --cluster "${ECS_CLUSTER}" \
