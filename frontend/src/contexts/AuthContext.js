@@ -50,8 +50,13 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
 
+      console.log('Login successful, user data:', data.user);
+      console.log('Setting user in context:', data.user);
       setUser(data.user);
       setIsAuthenticated(true);
+      
+      // Verify the user was set correctly
+      console.log('User set in context, isAuthenticated:', true);
       
       return { success: true, user: data.user };
     } catch (error) {

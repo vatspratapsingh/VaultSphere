@@ -31,20 +31,27 @@ const Login = () => {
           return;
         }
         
-        if (formData.role === 'client' && result.user.role === 'admin') {
-          setError('Access denied: You selected Client role but your account has admin privileges. Please select Administrator role.');
-          return;
-        }
-        
-        // Redirect based on user's actual role from database
+        // For client users, redirect based on their company type
+        console.log('User role from login:', result.user.role, 'Company:', result.user.company);
         if (result.user.role === 'admin') {
+          console.log('Navigating to /admin');
           navigate('/admin');
-        } else if (result.user.role === 'food') {
-          navigate('/food-company');
-        } else if (result.user.role === 'it') {
-          navigate('/it-company');
+        } else if (result.user.role === 'client') {
+          // Determine dashboard based on company name or email
+          if (result.user.company?.toLowerCase().includes('food') || result.user.email.includes('food')) {
+            console.log('Navigating to /food-company');
+            navigate('/food-company');
+          } else if (result.user.company?.toLowerCase().includes('tech') || result.user.company?.toLowerCase().includes('it') || result.user.email.includes('it')) {
+            console.log('Navigating to /it-company');
+            navigate('/it-company');
+          } else {
+            // Default to food company dashboard
+            console.log('Navigating to default /food-company');
+            navigate('/food-company');
+          }
         } else {
-          // Default client route
+          // Fallback for any other roles
+          console.log('Navigating to default /food-company');
           navigate('/food-company');
         }
       } else {
@@ -187,10 +194,10 @@ const Login = () => {
             Demo Credentials:
           </p>
           <div className="mt-2 text-xs text-gray-500 space-y-1">
-            <p>• <strong>eathealthy@gmail.com</strong> / <strong>food123</strong> → Food Company Dashboard (Select Client Role)</p>
-            <p>• <strong>techsolutions@gmail.com</strong> / <strong>tech123</strong> → IT Solutions Dashboard (Select Client Role)</p>
-            <p>• <strong>admin@vaultsphere.com</strong> / <strong>admin123</strong> → Admin Dashboard (Select Administrator Role)</p>
-            <p className="mt-2 text-xs text-gray-500">Important: Select the correct role that matches your account type</p>
+            <p>• <strong>food@vaultsphere.com</strong> / <strong>food123</strong> → Food Company Dashboard (Select Client User)</p>
+            <p>• <strong>it@vaultsphere.com</strong> / <strong>it123</strong> → IT Solutions Dashboard (Select Client User)</p>
+            <p>• <strong>admin@vaultsphere.com</strong> / <strong>admin123</strong> → Admin Dashboard (Select System Administrator)</p>
+            <p className="mt-2 text-xs text-gray-500">Note: Client users are automatically routed to their company dashboard</p>
           </div>
         </div>
       </div>

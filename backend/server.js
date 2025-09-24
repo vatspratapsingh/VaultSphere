@@ -12,6 +12,7 @@ const PORT = process.env.PORT || 5001;
 app.use(cors({
   origin: [
     'http://localhost:3000',
+    'http://localhost:3001',
     'http://vaultsphere-frontend-2024-vats.s3-website.eu-north-1.amazonaws.com',
     'https://vaultsphere-frontend-2024-vats.s3-website.eu-north-1.amazonaws.com'
   ],

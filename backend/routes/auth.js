@@ -19,7 +19,7 @@ router.post('/signup', async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
+    // Create user (Supabase schema uses password_hash and company)
     const newUser = await db.query(
       'INSERT INTO users (email, password_hash, name, role, company) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, name, role, company',
       [email, hashedPassword, name, 'user', 'Default Company']
@@ -46,7 +46,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Check password
+    // Check password (Supabase schema uses password_hash)
     const isValidPassword = await bcrypt.compare(password, user.rows[0].password_hash);
     if (!isValidPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
@@ -54,11 +54,11 @@ router.post('/login', async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { 
-        userId: user.rows[0].id, 
+      {
+        userId: user.rows[0].id,
         email: user.rows[0].email,
         role: user.rows[0].role,
-        tenantId: user.rows[0].tenant_id
+        tenantId: user.rows[0].tenant_id || null
       },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
@@ -72,7 +72,7 @@ router.post('/login', async (req, res) => {
         email: user.rows[0].email,
         name: user.rows[0].name,
         role: user.rows[0].role,
-        tenant_id: user.rows[0].tenant_id
+        company: user.rows[0].company || null
       }
     });
   } catch (error) {

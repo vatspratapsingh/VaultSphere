@@ -20,6 +20,8 @@ body {
   position: relative;
 }
 
+
+
 /* Add a subtle overlay for better text readability */
 body::before {
   content: '';
@@ -31,6 +33,12 @@ body::before {
   background: rgba(0, 0, 0, 0.3);
   z-index: -1;
   pointer-events: none;
+}
+
+/* Ensure main content appears above background */
+#root {
+  position: relative;
+  z-index: 1;
 }
 
 code {

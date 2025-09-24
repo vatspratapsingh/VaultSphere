@@ -6,7 +6,29 @@ const { authenticateToken } = require('../middleware/auth');
 // GET /api/tasks - Get all tasks for the authenticated user's tenant
 router.get('/', authenticateToken, async (req, res) => {
   try {
-    const tenantId = req.user.tenantId;
+    const userRole = req.user.role;
+    
+    // Map user role to tenant type
+    let tenantType;
+    if (userRole === 'admin') {
+      tenantType = 'admin';
+    } else if (userRole === 'food') {
+      tenantType = 'food';
+    } else if (userRole === 'it') {
+      tenantType = 'it';
+    } else {
+      return res.status(400).json({ error: 'Invalid user role' });
+    }
+    
+    // Get tenant ID based on type
+    const tenantQuery = 'SELECT id FROM tenants WHERE type = $1';
+    const tenantResult = await db.query(tenantQuery, [tenantType]);
+    
+    if (tenantResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Tenant not found' });
+    }
+    
+    const tenantId = tenantResult.rows[0].id;
     
     const query = `
       SELECT t.*, u.name as created_by_name 
@@ -28,7 +50,29 @@ router.get('/', authenticateToken, async (req, res) => {
 router.get('/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
-    const tenantId = req.user.tenantId;
+    const userRole = req.user.role;
+    
+    // Map user role to tenant type
+    let tenantType;
+    if (userRole === 'admin') {
+      tenantType = 'admin';
+    } else if (userRole === 'food') {
+      tenantType = 'food';
+    } else if (userRole === 'it') {
+      tenantType = 'it';
+    } else {
+      return res.status(400).json({ error: 'Invalid user role' });
+    }
+    
+    // Get tenant ID based on type
+    const tenantQuery = 'SELECT id FROM tenants WHERE type = $1';
+    const tenantResult = await db.query(tenantQuery, [tenantType]);
+    
+    if (tenantResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Tenant not found' });
+    }
+    
+    const tenantId = tenantResult.rows[0].id;
     
     const query = `
       SELECT t.*, u.name as created_by_name 
@@ -54,12 +98,34 @@ router.get('/:id', authenticateToken, async (req, res) => {
 router.post('/', authenticateToken, async (req, res) => {
   try {
     const { title, description, status, priority, due_date } = req.body;
-    const tenantId = req.user.tenantId;
+    const userRole = req.user.role;
     const createdBy = req.user.userId;
     
     if (!title) {
       return res.status(400).json({ error: 'Title is required' });
     }
+    
+    // Map user role to tenant type
+    let tenantType;
+    if (userRole === 'admin') {
+      tenantType = 'admin';
+    } else if (userRole === 'food') {
+      tenantType = 'food';
+    } else if (userRole === 'it') {
+      tenantType = 'it';
+    } else {
+      return res.status(400).json({ error: 'Invalid user role' });
+    }
+    
+    // Get tenant ID based on type
+    const tenantQuery = 'SELECT id FROM tenants WHERE type = $1';
+    const tenantResult = await db.query(tenantQuery, [tenantType]);
+    
+    if (tenantResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Tenant not found' });
+    }
+    
+    const tenantId = tenantResult.rows[0].id;
     
     const query = `
       INSERT INTO tasks (title, description, status, priority, due_date, tenant_id, created_by)
@@ -84,7 +150,29 @@ router.put('/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
     const { title, description, status, priority, due_date } = req.body;
-    const tenantId = req.user.tenantId;
+    const userRole = req.user.role;
+    
+    // Map user role to tenant type
+    let tenantType;
+    if (userRole === 'admin') {
+      tenantType = 'admin';
+    } else if (userRole === 'food') {
+      tenantType = 'food';
+    } else if (userRole === 'it') {
+      tenantType = 'it';
+    } else {
+      return res.status(400).json({ error: 'Invalid user role' });
+    }
+    
+    // Get tenant ID based on type
+    const tenantQuery = 'SELECT id FROM tenants WHERE type = $1';
+    const tenantResult = await db.query(tenantQuery, [tenantType]);
+    
+    if (tenantResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Tenant not found' });
+    }
+    
+    const tenantId = tenantResult.rows[0].id;
     
     // First check if task exists and belongs to user's tenant
     const checkQuery = 'SELECT id FROM tasks WHERE id = $1 AND tenant_id = $2';
@@ -117,7 +205,29 @@ router.put('/:id', authenticateToken, async (req, res) => {
 router.delete('/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
-    const tenantId = req.user.tenantId;
+    const userRole = req.user.role;
+    
+    // Map user role to tenant type
+    let tenantType;
+    if (userRole === 'admin') {
+      tenantType = 'admin';
+    } else if (userRole === 'food') {
+      tenantType = 'food';
+    } else if (userRole === 'it') {
+      tenantType = 'it';
+    } else {
+      return res.status(400).json({ error: 'Invalid user role' });
+    }
+    
+    // Get tenant ID based on type
+    const tenantQuery = 'SELECT id FROM tenants WHERE type = $1';
+    const tenantResult = await db.query(tenantQuery, [tenantType]);
+    
+    if (tenantResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Tenant not found' });
+    }
+    
+    const tenantId = tenantResult.rows[0].id;
     
     const query = 'DELETE FROM tasks WHERE id = $1 AND tenant_id = $2 RETURNING *';
     const result = await db.query(query, [id, tenantId]);

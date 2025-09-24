@@ -14,21 +14,21 @@ const demoUsers = [
     name: 'Food Company User',
     email: 'food@vaultsphere.com',
     password: 'food123',
-    role: 'food',
+    role: 'client',
     company: 'Healthy Foods Inc.'
   },
   {
     name: 'IT Company User',
     email: 'it@vaultsphere.com',
     password: 'it123',
-    role: 'it',
+    role: 'client',
     company: 'Tech Solutions Ltd.'
   },
   {
     name: 'Test User',
     email: 'eathealthy@gmail.com',
     password: 'food123',
-    role: 'food',
+    role: 'client',
     company: 'Test Company'
   }
 ];
@@ -42,7 +42,13 @@ async function createDemoUsers() {
       const existingUser = await db.query('SELECT * FROM users WHERE email = $1', [user.email]);
       
       if (existingUser.rows.length > 0) {
-        console.log(`⚠️  User ${user.email} already exists, skipping...`);
+        // Update existing user's password and role
+        const hashedPassword = await bcrypt.hash(user.password, 10);
+        await db.query(
+          'UPDATE users SET password_hash = $1, role = $2, company = $3 WHERE email = $4',
+          [hashedPassword, user.role, user.company, user.email]
+        );
+        console.log(`🔄 Updated user: ${user.name} (${user.email})`);
         continue;
       }
       
