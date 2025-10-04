@@ -2,11 +2,6 @@
 
 A complete, production-ready multi-tenant SaaS platform built with modern technologies. This enterprise-grade application demonstrates a full-stack solution with authentication, role-based access control, multi-tenancy, cloud deployment, advanced monitoring, auto-scaling, and machine learning-powered security features.
 
-## 🚀 Live Demo
-
-- **Frontend**: [http://vaultsphere-frontend-2024-vats.s3-website.eu-north-1.amazonaws.com](http://vaultsphere-frontend-2024-vats.s3-website.eu-north-1.amazonaws.com)
-- **Backend API**: [https://api.vaultsphere.cloud](https://api.vaultsphere.cloud)
-
 ## 🎯 Features
 
 ### ✅ **Complete Multi-Tenant SaaS Platform**
@@ -336,4 +331,3 @@ curl -X POST http://localhost:5001/api/auth/login \
 
 **⭐ Star this repository if you found it helpful!**
 
-**🚀 Ready for production deployment and user demos!**
