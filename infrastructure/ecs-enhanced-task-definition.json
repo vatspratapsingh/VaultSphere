@@ -1,0 +1,167 @@
+{
+  "family": "vaultsphere-backend-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::687450791196:role/VaultSphere-ECS-ExecutionRole",
+  "taskRoleArn": "arn:aws:iam::687450791196:role/VaultSphere-ECS-TaskRole",
+  "containerDefinitions": [
+    {
+      "name": "vaultsphere-backend",
+      "image": "687450791196.dkr.ecr.eu-north-1.amazonaws.com/vaultsphere-backend:latest",
+      "portMappings": [
+        {
+          "containerPort": 5000,
+          "protocol": "tcp",
+          "name": "http"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+          "name": "NODE_ENV",
+          "value": "production"
+        },
+        {
+          "name": "PORT",
+          "value": "5000"
+        },
+        {
+          "name": "AWS_REGION",
+          "value": "eu-north-1"
+        },
+        {
+          "name": "CLOUDWATCH_ENABLED",
+          "value": "true"
+        },
+        {
+          "name": "ALERTS_ENABLED",
+          "value": "true"
+        },
+        {
+          "name": "ENHANCED_MONITORING_ENABLED",
+          "value": "true"
+        },
+        {
+          "name": "SSL_ENABLED",
+          "value": "true"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "DATABASE_URL",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:123456789012:secret:vaultsphere/database-url"
+        },
+        {
+          "name": "JWT_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:123456789012:secret:vaultsphere/jwt-secret"
+        },
+        {
+          "name": "ENCRYPTION_KEY",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:123456789012:secret:vaultsphere/encryption-key"
+        },
+        {
+          "name": "SNS_TOPIC_ARN",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:123456789012:secret:vaultsphere/sns-topic-arn"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/vaultsphere-backend",
+          "awslogs-region": "eu-north-1",
+          "awslogs-stream-prefix": "ecs",
+          "awslogs-create-group": "true"
+        }
+      },
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "curl -f http://localhost:5000/api/health || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      },
+      "stopTimeout": 30,
+      "startTimeout": 120,
+      "dependsOn": [],
+      "volumesFrom": [],
+      "links": [],
+      "mountPoints": [],
+      "readonlyRootFilesystem": false,
+      "privileged": false,
+      "dockerLabels": {
+        "application": "vaultsphere",
+        "component": "backend",
+        "environment": "production"
+      },
+      "ulimits": [
+        {
+          "name": "nofile",
+          "softLimit": 65536,
+          "hardLimit": 65536
+        }
+      ],
+      "resourceRequirements": []
+    },
+    {
+      "name": "datadog-agent",
+      "image": "public.ecr.aws/datadog/agent:latest",
+      "essential": false,
+      "environment": [
+        {
+          "name": "DD_API_KEY",
+          "value": "${DD_API_KEY}"
+        },
+        {
+          "name": "DD_SITE",
+          "value": "datadoghq.eu"
+        },
+        {
+          "name": "ECS_FARGATE",
+          "value": "true"
+        },
+        {
+          "name": "DD_DOCKER_LABELS_AS_TAGS",
+          "value": "true"
+        },
+        {
+          "name": "DD_LOGS_ENABLED",
+          "value": "true"
+        },
+        {
+          "name": "DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL",
+          "value": "true"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/datadog-agent",
+          "awslogs-region": "eu-north-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "memoryReservation": 256
+    }
+  ],
+  "volumes": [],
+  "placementConstraints": [],
+  "tags": [
+    {
+      "key": "Environment",
+      "value": "production"
+    },
+    {
+      "key": "Application",
+      "value": "VaultSphere"
+    },
+    {
+      "key": "Component",
+      "value": "Backend"
+    }
+  ]
+}

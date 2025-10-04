@@ -1,0 +1,15 @@
+{
+    "PolicyName": "vaultsphere-memory-scaling-policy",
+    "ServiceNamespace": "ecs",
+    "ResourceId": "service/vaultsphere-cluster/vaultsphere-backend-service",
+    "ScalableDimension": "ecs:service:DesiredCount",
+    "PolicyType": "TargetTrackingScaling",
+    "TargetTrackingScalingPolicyConfiguration": {
+        "TargetValue": 80.0,
+        "PredefinedMetricSpecification": {
+            "PredefinedMetricType": "ECSServiceAverageMemoryUtilization"
+        },
+        "ScaleOutCooldown": 300,
+        "ScaleInCooldown": 600
+    }
+}

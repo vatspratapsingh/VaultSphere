@@ -1,0 +1,292 @@
+{
+  "callerReference": "vaultsphere-cloudfront-2025",
+  "aliases": [
+    "app.vaultsphere.com",
+    "www.vaultsphere.com"
+  ],
+  "defaultRootObject": "index.html",
+  "comment": "VaultSphere CDN Distribution with Enhanced Caching and Security",
+  "enabled": true,
+  "priceClass": "PriceClass_All",
+  "httpVersion": "http2and3",
+  "isIPV6Enabled": true,
+  "origins": [
+    {
+      "id": "vaultsphere-frontend-s3",
+      "domainName": "vaultsphere-frontend.s3.eu-north-1.amazonaws.com",
+      "originPath": "",
+      "customOriginConfig": null,
+      "s3OriginConfig": {
+        "originAccessIdentity": "origin-access-identity/cloudfront/E1234567890123"
+      },
+      "connectionAttempts": 3,
+      "connectionTimeout": 10,
+      "originShield": {
+        "enabled": true,
+        "originShieldRegion": "eu-north-1"
+      }
+    },
+    {
+      "id": "vaultsphere-backend-alb",
+      "domainName": "vaultsphere-backend-alb-1234567890.eu-north-1.elb.amazonaws.com",
+      "originPath": "",
+      "customOriginConfig": {
+        "httpPort": 80,
+        "httpsPort": 443,
+        "originProtocolPolicy": "https-only",
+        "originSslProtocols": [
+          "TLSv1.2"
+        ],
+        "originReadTimeout": 30,
+        "originKeepaliveTimeout": 5
+      },
+      "s3OriginConfig": null,
+      "connectionAttempts": 3,
+      "connectionTimeout": 10,
+      "originShield": {
+        "enabled": true,
+        "originShieldRegion": "eu-north-1"
+      }
+    }
+  ],
+  "originGroups": [
+    {
+      "id": "vaultsphere-backend-failover",
+      "failoverCriteria": {
+        "statusCodes": [
+          500,
+          502,
+          503,
+          504
+        ]
+      },
+      "members": [
+        {
+          "originId": "vaultsphere-backend-alb"
+        }
+      ]
+    }
+  ],
+  "defaultCacheBehavior": {
+    "targetOriginId": "vaultsphere-frontend-s3",
+    "viewerProtocolPolicy": "redirect-to-https",
+    "allowedMethods": [
+      "GET",
+      "HEAD",
+      "OPTIONS"
+    ],
+    "cachedMethods": [
+      "GET",
+      "HEAD"
+    ],
+    "compress": true,
+    "cachePolicyId": "4135ea2d-6df8-44a3-9df3-4b5a84be39ad",
+    "originRequestPolicyId": "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf",
+    "responseHeadersPolicyId": "5cc3b908-e619-4b99-88e5-2cf7f45965bd",
+    "realtimeLogConfigArn": "arn:aws:logs:eu-north-1:123456789012:log-group:vaultsphere-cloudfront-logs",
+    "fieldLevelEncryptionId": "",
+    "trustedSigners": {
+      "enabled": false,
+      "items": []
+    },
+    "trustedKeyGroups": {
+      "enabled": false,
+      "items": []
+    },
+    "functionAssociations": [
+      {
+        "eventType": "viewer-request",
+        "functionARN": "arn:aws:cloudfront::123456789012:function/vaultsphere-security-headers"
+      }
+    ],
+    "lambdaFunctionAssociations": []
+  },
+  "cacheBehaviors": [
+    {
+      "pathPattern": "/api/*",
+      "targetOriginId": "vaultsphere-backend-alb",
+      "viewerProtocolPolicy": "https-only",
+      "allowedMethods": [
+        "DELETE",
+        "GET",
+        "HEAD",
+        "OPTIONS",
+        "PATCH",
+        "POST",
+        "PUT"
+      ],
+      "cachedMethods": [
+        "GET",
+        "HEAD"
+      ],
+      "compress": true,
+      "cachePolicyId": "4135ea2d-6df8-44a3-9df3-4b5a84be39ad",
+      "originRequestPolicyId": "216adef6-5c7f-47e4-b989-5492eafa07d3",
+      "responseHeadersPolicyId": "5cc3b908-e619-4b99-88e5-2cf7f45965bd",
+      "realtimeLogConfigArn": "arn:aws:logs:eu-north-1:123456789012:log-group:vaultsphere-cloudfront-api-logs",
+      "fieldLevelEncryptionId": "",
+      "trustedSigners": {
+        "enabled": false,
+        "items": []
+      },
+      "trustedKeyGroups": {
+        "enabled": false,
+        "items": []
+      },
+      "functionAssociations": [
+        {
+          "eventType": "viewer-request",
+          "functionARN": "arn:aws:cloudfront::123456789012:function/vaultsphere-api-auth"
+        }
+      ],
+      "lambdaFunctionAssociations": [
+        {
+          "eventType": "origin-request",
+          "lambdaFunctionARN": "arn:aws:lambda:us-east-1:123456789012:function:vaultsphere-request-modifier:1",
+          "includeBody": true
+        }
+      ]
+    },
+    {
+      "pathPattern": "/static/*",
+      "targetOriginId": "vaultsphere-frontend-s3",
+      "viewerProtocolPolicy": "redirect-to-https",
+      "allowedMethods": [
+        "GET",
+        "HEAD",
+        "OPTIONS"
+      ],
+      "cachedMethods": [
+        "GET",
+        "HEAD"
+      ],
+      "compress": true,
+      "cachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6",
+      "originRequestPolicyId": "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf",
+      "responseHeadersPolicyId": "60669652-455b-4ae9-85a4-c4c02393f86c",
+      "realtimeLogConfigArn": "",
+      "fieldLevelEncryptionId": "",
+      "trustedSigners": {
+        "enabled": false,
+        "items": []
+      },
+      "trustedKeyGroups": {
+        "enabled": false,
+        "items": []
+      },
+      "functionAssociations": [
+        {
+          "eventType": "viewer-response",
+          "functionARN": "arn:aws:cloudfront::123456789012:function/vaultsphere-cache-headers"
+        }
+      ],
+      "lambdaFunctionAssociations": []
+    },
+    {
+      "pathPattern": "/assets/*",
+      "targetOriginId": "vaultsphere-frontend-s3",
+      "viewerProtocolPolicy": "redirect-to-https",
+      "allowedMethods": [
+        "GET",
+        "HEAD"
+      ],
+      "cachedMethods": [
+        "GET",
+        "HEAD"
+      ],
+      "compress": true,
+      "cachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6",
+      "originRequestPolicyId": "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf",
+      "responseHeadersPolicyId": "60669652-455b-4ae9-85a4-c4c02393f86c",
+      "realtimeLogConfigArn": "",
+      "fieldLevelEncryptionId": "",
+      "trustedSigners": {
+        "enabled": false,
+        "items": []
+      },
+      "trustedKeyGroups": {
+        "enabled": false,
+        "items": []
+      },
+      "functionAssociations": [],
+      "lambdaFunctionAssociations": []
+    }
+  ],
+  "customErrorResponses": [
+    {
+      "errorCode": 403,
+      "responsePagePath": "/index.html",
+      "responseCode": "200",
+      "errorCachingMinTTL": 300
+    },
+    {
+      "errorCode": 404,
+      "responsePagePath": "/index.html",
+      "responseCode": "200",
+      "errorCachingMinTTL": 300
+    },
+    {
+      "errorCode": 500,
+      "responsePagePath": "/error.html",
+      "responseCode": "500",
+      "errorCachingMinTTL": 0
+    },
+    {
+      "errorCode": 502,
+      "responsePagePath": "/maintenance.html",
+      "responseCode": "503",
+      "errorCachingMinTTL": 0
+    },
+    {
+      "errorCode": 503,
+      "responsePagePath": "/maintenance.html",
+      "responseCode": "503",
+      "errorCachingMinTTL": 0
+    },
+    {
+      "errorCode": 504,
+      "responsePagePath": "/maintenance.html",
+      "responseCode": "503",
+      "errorCachingMinTTL": 0
+    }
+  ],
+  "webACLId": "arn:aws:wafv2:us-east-1:123456789012:global/webacl/vaultsphere-waf/12345678-1234-1234-1234-123456789012",
+  "viewerCertificate": {
+    "acmCertificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012",
+    "sslSupportMethod": "sni-only",
+    "minimumProtocolVersion": "TLSv1.2_2021",
+    "certificateSource": "acm"
+  },
+  "restrictions": {
+    "geoRestriction": {
+      "restrictionType": "none",
+      "items": []
+    }
+  },
+  "logging": {
+    "enabled": true,
+    "includeCookies": false,
+    "bucket": "vaultsphere-cloudfront-logs.s3.amazonaws.com",
+    "prefix": "access-logs/"
+  },
+  "tags": [
+    {
+      "key": "Environment",
+      "value": "production"
+    },
+    {
+      "key": "Application",
+      "value": "VaultSphere"
+    },
+    {
+      "key": "Component",
+      "value": "CDN"
+    },
+    {
+      "key": "ManagedBy",
+      "value": "CloudFormation"
+    }
+  ],
+  "continuousDeploymentPolicyId": "",
+  "staging": false
+}

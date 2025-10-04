@@ -1,0 +1,28 @@
+{
+  "name": "vaultsphere",
+  "version": "1.0.0",
+  "description": "A complete, production-ready multi-tenant SaaS platform built with modern technologies. This MVP demonstrates a full-stack application with authentication, role-based access control, multi-tenancy, and cloud deployment.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:security": "node backend/scripts/security-test.js",
+    "monitor:health": "node scripts/monitoring-dashboard.js",
+    "perf:baseline": "node scripts/performance-test.js",
+    "deploy:full": "echo \"Production deployment would be handled by CI/CD pipeline\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vatspratapsingh/VaultSphere.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/vatspratapsingh/VaultSphere/issues"
+  },
+  "homepage": "https://github.com/vatspratapsingh/VaultSphere#readme",
+  "dependencies": {
+    "axios": "^1.12.2"
+  }
+}

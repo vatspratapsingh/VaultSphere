@@ -1,0 +1,88 @@
+{
+  "family": "vaultsphere-backend",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::ACCOUNT_ID:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::ACCOUNT_ID:role/vaultsphere-task-role",
+  "containerDefinitions": [
+    {
+      "name": "vaultsphere-backend",
+      "image": "ACCOUNT_ID.dkr.ecr.REGION.amazonaws.com/vaultsphere-backend:latest",
+      "portMappings": [
+        {
+          "containerPort": 5001,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+          "name": "NODE_ENV",
+          "value": "production"
+        },
+        {
+          "name": "PORT",
+          "value": "5001"
+        },
+        {
+          "name": "AWS_REGION",
+          "value": "eu-north-1"
+        },
+        {
+          "name": "CLOUDWATCH_ENABLED",
+          "value": "true"
+        },
+        {
+          "name": "ALERTS_ENABLED",
+          "value": "true"
+        },
+        {
+          "name": "SECRETS_MANAGER_ENABLED",
+          "value": "true"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "DATABASE_URL",
+          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:vaultsphere/database:DATABASE_URL::"
+        },
+        {
+          "name": "JWT_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:vaultsphere/jwt:JWT_SECRET::"
+        },
+        {
+          "name": "SNS_TOPIC_ARN",
+          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:vaultsphere/application:SNS_TOPIC_ARN::"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/vaultsphere-backend",
+          "awslogs-region": "eu-north-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "curl -f http://localhost:5001/api/health || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      },
+      "stopTimeout": 30,
+      "ulimits": [
+        {
+          "name": "nofile",
+          "softLimit": 65536,
+          "hardLimit": 65536
+        }
+      ]
+    }
+  ]
+}

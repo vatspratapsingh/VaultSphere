@@ -1,0 +1,77 @@
+{
+  "serviceName": "vaultsphere-backend",
+  "cluster": "vaultsphere-cluster",
+  "taskDefinition": "vaultsphere-backend-task",
+  "desiredCount": 3,
+  "launchType": "FARGATE",
+  "platformVersion": "LATEST",
+  "networkConfiguration": {
+    "awsvpcConfiguration": {
+      "subnets": [
+        "subnet-12345678",
+        "subnet-87654321",
+        "subnet-11223344"
+      ],
+      "securityGroups": [
+        "sg-vaultsphere-backend"
+      ],
+      "assignPublicIp": "ENABLED"
+    }
+  },
+  "loadBalancers": [
+    {
+      "targetGroupArn": "arn:aws:elasticloadbalancing:eu-north-1:123456789012:targetgroup/vaultsphere-backend/1234567890123456",
+      "containerName": "vaultsphere-backend",
+      "containerPort": 5000
+    }
+  ],
+  "serviceRegistries": [
+    {
+      "registryArn": "arn:aws:servicediscovery:eu-north-1:123456789012:service/srv-vaultsphere-backend",
+      "containerName": "vaultsphere-backend",
+      "containerPort": 5000
+    }
+  ],
+  "deploymentConfiguration": {
+    "maximumPercent": 200,
+    "minimumHealthyPercent": 50,
+    "deploymentCircuitBreaker": {
+      "enable": true,
+      "rollback": true
+    }
+  },
+  "serviceTags": [
+    {
+      "key": "Environment",
+      "value": "production"
+    },
+    {
+      "key": "Application",
+      "value": "VaultSphere"
+    },
+    {
+      "key": "Component",
+      "value": "Backend"
+    },
+    {
+      "key": "ManagedBy",
+      "value": "ECS"
+    }
+  ],
+  "enableExecuteCommand": true,
+  "enableLogging": true,
+  "propagateTags": "SERVICE",
+  "placementConstraints": [],
+  "placementStrategy": [
+    {
+      "type": "spread",
+      "field": "attribute:ecs.availability-zone"
+    },
+    {
+      "type": "spread",
+      "field": "instanceId"
+    }
+  ],
+  "healthCheckGracePeriodSeconds": 60,
+  "schedulingStrategy": "REPLICA"
+}

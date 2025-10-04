@@ -1,0 +1,289 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vaultsphere
+  labels:
+    name: vaultsphere
+    environment: production
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: vaultsphere-secrets
+  namespace: vaultsphere
+type: Opaque
+stringData:
+  DATABASE_URL: "postgresql://username:password@host:5432/database"
+  JWT_SECRET: "your-jwt-secret"
+  SNS_TOPIC_ARN: "arn:aws:sns:eu-north-1:123456789012:VaultSphere-Alerts"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vaultsphere-config
+  namespace: vaultsphere
+data:
+  NODE_ENV: "production"
+  PORT: "5001"
+  AWS_REGION: "eu-north-1"
+  CLOUDWATCH_ENABLED: "true"
+  ALERTS_ENABLED: "true"
+  SECRETS_MANAGER_ENABLED: "true"
+  RATE_LIMIT_WINDOW_MS: "900000"
+  RATE_LIMIT_MAX_REQUESTS: "100"
+  AUTH_RATE_LIMIT_MAX: "5"
+  PASSWORD_RESET_RATE_LIMIT_MAX: "3"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vaultsphere-backend
+  namespace: vaultsphere
+  labels:
+    app: vaultsphere-backend
+    version: v1
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: vaultsphere-backend
+  template:
+    metadata:
+      labels:
+        app: vaultsphere-backend
+        version: v1
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "5001"
+        prometheus.io/path: "/api/metrics"
+    spec:
+      serviceAccountName: vaultsphere-service-account
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+      containers:
+      - name: vaultsphere-backend
+        image: ACCOUNT_ID.dkr.ecr.REGION.amazonaws.com/vaultsphere-backend:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5001
+          name: http
+          protocol: TCP
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: vaultsphere-config
+              key: NODE_ENV
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: vaultsphere-config
+              key: PORT
+        - name: AWS_REGION
+          valueFrom:
+            configMapKeyRef:
+              name: vaultsphere-config
+              key: AWS_REGION
+        - name: CLOUDWATCH_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: vaultsphere-config
+              key: CLOUDWATCH_ENABLED
+        - name: ALERTS_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: vaultsphere-config
+              key: ALERTS_ENABLED
+        - name: SECRETS_MANAGER_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: vaultsphere-config
+              key: SECRETS_MANAGER_ENABLED
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: vaultsphere-secrets
+              key: DATABASE_URL
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: vaultsphere-secrets
+              key: JWT_SECRET
+        - name: SNS_TOPIC_ARN
+          valueFrom:
+            secretKeyRef:
+              name: vaultsphere-secrets
+              key: SNS_TOPIC_ARN
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 5001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 5001
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 15"]
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - name: tmp-volume
+          mountPath: /tmp
+        - name: logs-volume
+          mountPath: /app/logs
+      volumes:
+      - name: tmp-volume
+        emptyDir: {}
+      - name: logs-volume
+        emptyDir: {}
+      terminationGracePeriodSeconds: 30
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vaultsphere-backend-service
+  namespace: vaultsphere
+  labels:
+    app: vaultsphere-backend
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-path: "/api/health"
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 5001
+    protocol: TCP
+    name: http
+  selector:
+    app: vaultsphere-backend
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vaultsphere-service-account
+  namespace: vaultsphere
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT_ID:role/vaultsphere-pod-role
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: vaultsphere-backend-hpa
+  namespace: vaultsphere
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: vaultsphere-backend
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
+      - type: Pods
+        value: 4
+        periodSeconds: 15
+      selectPolicy: Max
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vaultsphere-ingress
+  namespace: vaultsphere
+  annotations:
+    kubernetes.io/ingress.class: "alb"
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/healthcheck-path: /api/health
+    alb.ingress.kubernetes.io/healthcheck-interval-seconds: '30'
+    alb.ingress.kubernetes.io/healthcheck-timeout-seconds: '5'
+    alb.ingress.kubernetes.io/healthy-threshold-count: '2'
+    alb.ingress.kubernetes.io/unhealthy-threshold-count: '3'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:REGION:ACCOUNT_ID:certificate/certificate-id
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS-1-2-2017-01
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+spec:
+  rules:
+  - host: api.vaultsphere.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: vaultsphere-backend-service
+            port:
+              number: 80
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: vaultsphere-backend-pdb
+  namespace: vaultsphere
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: vaultsphere-backend
