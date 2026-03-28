@@ -1,0 +1,76 @@
+{
+  "scalableTarget": {
+    "serviceNamespace": "ecs",
+    "resourceId": "service/vaultsphere-cluster/vaultsphere-backend-service",
+    "scalableDimension": "ecs:service:DesiredCount",
+    "minCapacity": 2,
+    "maxCapacity": 10,
+    "roleArn": "arn:aws:iam::ACCOUNT_ID:role/application-autoscaling-ecs-service"
+  },
+  "scalingPolicies": [
+    {
+      "policyName": "vaultsphere-cpu-scaling-policy",
+      "policyType": "TargetTrackingScaling",
+      "targetTrackingScalingPolicyConfiguration": {
+        "targetValue": 70.0,
+        "predefinedMetricSpecification": {
+          "predefinedMetricType": "ECSServiceAverageCPUUtilization"
+        },
+        "scaleOutCooldown": 300,
+        "scaleInCooldown": 300
+      }
+    },
+    {
+      "policyName": "vaultsphere-memory-scaling-policy",
+      "policyType": "TargetTrackingScaling",
+      "targetTrackingScalingPolicyConfiguration": {
+        "targetValue": 80.0,
+        "predefinedMetricSpecification": {
+          "predefinedMetricType": "ECSServiceAverageMemoryUtilization"
+        },
+        "scaleOutCooldown": 300,
+        "scaleInCooldown": 300
+      }
+    },
+    {
+      "policyName": "vaultsphere-request-count-scaling-policy",
+      "policyType": "TargetTrackingScaling",
+      "targetTrackingScalingPolicyConfiguration": {
+        "targetValue": 1000.0,
+        "customMetricSpecification": {
+          "metricName": "RequestCountPerTarget",
+          "namespace": "AWS/ApplicationELB",
+          "dimensions": [
+            {
+              "name": "TargetGroup",
+              "value": "targetgroup/vaultsphere-backend-tg/1234567890123456"
+            }
+          ],
+          "statistic": "Sum"
+        },
+        "scaleOutCooldown": 300,
+        "scaleInCooldown": 300
+      }
+    }
+  ],
+  "scheduledActions": [
+    {
+      "scheduledActionName": "scale-up-business-hours",
+      "schedule": "cron(0 8 * * MON-FRI)",
+      "scalableTargetAction": {
+        "minCapacity": 3,
+        "maxCapacity": 15
+      },
+      "timezone": "Europe/Stockholm"
+    },
+    {
+      "scheduledActionName": "scale-down-off-hours",
+      "schedule": "cron(0 20 * * MON-FRI)",
+      "scalableTargetAction": {
+        "minCapacity": 2,
+        "maxCapacity": 10
+      },
+      "timezone": "Europe/Stockholm"
+    }
+  ]
+}

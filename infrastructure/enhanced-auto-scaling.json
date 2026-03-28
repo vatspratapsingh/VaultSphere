@@ -1,0 +1,254 @@
+{
+  "autoScalingGroupName": "vaultsphere-backend-asg",
+  "minSize": 3,
+  "maxSize": 20,
+  "desiredCapacity": 3,
+  "defaultCooldown": 300,
+  "healthCheckType": "ELB",
+  "healthCheckGracePeriod": 300,
+  "launchTemplate": {
+    "launchTemplateName": "vaultsphere-backend-lt",
+    "version": "$Latest"
+  },
+  "targetGroupARNs": [
+    "arn:aws:elasticloadbalancing:eu-north-1:123456789012:targetgroup/vaultsphere-backend/1234567890123456"
+  ],
+  "vpcZoneIdentifier": [
+    "subnet-12345678",
+    "subnet-87654321",
+    "subnet-11223344"
+  ],
+  "terminationPolicies": [
+    "OldestInstance",
+    "Default"
+  ],
+  "newInstancesProtectedFromScaleIn": false,
+  "serviceLinkedRoleARN": "arn:aws:iam::123456789012:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+  "tags": [
+    {
+      "key": "Name",
+      "value": "vaultsphere-backend-instance",
+      "propagateAtLaunch": true,
+      "resourceId": "vaultsphere-backend-asg",
+      "resourceType": "auto-scaling-group"
+    },
+    {
+      "key": "Environment",
+      "value": "production",
+      "propagateAtLaunch": true,
+      "resourceId": "vaultsphere-backend-asg",
+      "resourceType": "auto-scaling-group"
+    },
+    {
+      "key": "Application",
+      "value": "VaultSphere",
+      "propagateAtLaunch": true,
+      "resourceId": "vaultsphere-backend-asg",
+      "resourceType": "auto-scaling-group"
+    },
+    {
+      "key": "Component",
+      "value": "Backend",
+      "propagateAtLaunch": true,
+      "resourceId": "vaultsphere-backend-asg",
+      "resourceType": "auto-scaling-group"
+    }
+  ],
+  "scalingPolicies": [
+    {
+      "policyName": "vaultsphere-scale-up-policy",
+      "policyType": "TargetTrackingScaling",
+      "targetTrackingConfiguration": {
+        "targetValue": 70.0,
+        "predefinedMetricSpecification": {
+          "predefinedMetricType": "ASGAverageCPUUtilization"
+        },
+        "scaleOutCooldown": 300,
+        "scaleInCooldown": 300,
+        "disableScaleIn": false
+      },
+      "enabled": true
+    },
+    {
+      "policyName": "vaultsphere-memory-scale-policy",
+      "policyType": "TargetTrackingScaling",
+      "targetTrackingConfiguration": {
+        "targetValue": 80.0,
+        "customizedMetricSpecification": {
+          "metricName": "MemoryUtilization",
+          "namespace": "AWS/ECS",
+          "dimensions": [
+            {
+              "name": "ServiceName",
+              "value": "vaultsphere-backend"
+            },
+            {
+              "name": "ClusterName",
+              "value": "vaultsphere-cluster"
+            }
+          ],
+          "statistic": "Average"
+        },
+        "scaleOutCooldown": 300,
+        "scaleInCooldown": 600,
+        "disableScaleIn": false
+      },
+      "enabled": true
+    },
+    {
+      "policyName": "vaultsphere-request-count-scale-policy",
+      "policyType": "TargetTrackingScaling",
+      "targetTrackingConfiguration": {
+        "targetValue": 1000.0,
+        "predefinedMetricSpecification": {
+          "predefinedMetricType": "ALBRequestCountPerTarget",
+          "resourceLabel": "app/vaultsphere-alb/1234567890123456/targetgroup/vaultsphere-backend/1234567890123456"
+        },
+        "scaleOutCooldown": 300,
+        "scaleInCooldown": 300,
+        "disableScaleIn": false
+      },
+      "enabled": true
+    }
+  ],
+  "cloudWatchAlarms": [
+    {
+      "alarmName": "vaultsphere-high-cpu-alarm",
+      "alarmDescription": "Alarm when CPU exceeds 80%",
+      "metricName": "CPUUtilization",
+      "namespace": "AWS/ECS",
+      "statistic": "Average",
+      "period": 300,
+      "evaluationPeriods": 2,
+      "threshold": 80.0,
+      "comparisonOperator": "GreaterThanThreshold",
+      "dimensions": [
+        {
+          "name": "ServiceName",
+          "value": "vaultsphere-backend"
+        },
+        {
+          "name": "ClusterName",
+          "value": "vaultsphere-cluster"
+        }
+      ],
+      "alarmActions": [
+        "arn:aws:sns:eu-north-1:123456789012:vaultsphere-alerts"
+      ],
+      "okActions": [
+        "arn:aws:sns:eu-north-1:123456789012:vaultsphere-alerts"
+      ],
+      "treatMissingData": "breaching"
+    },
+    {
+      "alarmName": "vaultsphere-high-memory-alarm",
+      "alarmDescription": "Alarm when Memory exceeds 85%",
+      "metricName": "MemoryUtilization",
+      "namespace": "AWS/ECS",
+      "statistic": "Average",
+      "period": 300,
+      "evaluationPeriods": 2,
+      "threshold": 85.0,
+      "comparisonOperator": "GreaterThanThreshold",
+      "dimensions": [
+        {
+          "name": "ServiceName",
+          "value": "vaultsphere-backend"
+        },
+        {
+          "name": "ClusterName",
+          "value": "vaultsphere-cluster"
+        }
+      ],
+      "alarmActions": [
+        "arn:aws:sns:eu-north-1:123456789012:vaultsphere-alerts"
+      ],
+      "okActions": [
+        "arn:aws:sns:eu-north-1:123456789012:vaultsphere-alerts"
+      ],
+      "treatMissingData": "breaching"
+    },
+    {
+      "alarmName": "vaultsphere-high-response-time-alarm",
+      "alarmDescription": "Alarm when response time exceeds 2 seconds",
+      "metricName": "TargetResponseTime",
+      "namespace": "AWS/ApplicationELB",
+      "statistic": "Average",
+      "period": 300,
+      "evaluationPeriods": 2,
+      "threshold": 2.0,
+      "comparisonOperator": "GreaterThanThreshold",
+      "dimensions": [
+        {
+          "name": "TargetGroup",
+          "value": "targetgroup/vaultsphere-backend/1234567890123456"
+        },
+        {
+          "name": "LoadBalancer",
+          "value": "app/vaultsphere-alb/1234567890123456"
+        }
+      ],
+      "alarmActions": [
+        "arn:aws:sns:eu-north-1:123456789012:vaultsphere-alerts"
+      ],
+      "okActions": [
+        "arn:aws:sns:eu-north-1:123456789012:vaultsphere-alerts"
+      ],
+      "treatMissingData": "notBreaching"
+    },
+    {
+      "alarmName": "vaultsphere-low-healthy-hosts-alarm",
+      "alarmDescription": "Alarm when healthy host count is too low",
+      "metricName": "HealthyHostCount",
+      "namespace": "AWS/ApplicationELB",
+      "statistic": "Average",
+      "period": 60,
+      "evaluationPeriods": 2,
+      "threshold": 2.0,
+      "comparisonOperator": "LessThanThreshold",
+      "dimensions": [
+        {
+          "name": "TargetGroup",
+          "value": "targetgroup/vaultsphere-backend/1234567890123456"
+        },
+        {
+          "name": "LoadBalancer",
+          "value": "app/vaultsphere-alb/1234567890123456"
+        }
+      ],
+      "alarmActions": [
+        "arn:aws:sns:eu-north-1:123456789012:vaultsphere-alerts"
+      ],
+      "okActions": [
+        "arn:aws:sns:eu-north-1:123456789012:vaultsphere-alerts"
+      ],
+      "treatMissingData": "breaching"
+    }
+  ],
+  "lifecycleHooks": [
+    {
+      "lifecycleHookName": "vaultsphere-launch-hook",
+      "lifecycleTransition": "autoscaling:EC2_INSTANCE_LAUNCHING",
+      "defaultResult": "CONTINUE",
+      "heartbeatTimeout": 300,
+      "notificationTargetARN": "arn:aws:sns:eu-north-1:123456789012:vaultsphere-lifecycle",
+      "roleARN": "arn:aws:iam::123456789012:role/vaultsphere-lifecycle-role"
+    },
+    {
+      "lifecycleHookName": "vaultsphere-terminate-hook",
+      "lifecycleTransition": "autoscaling:EC2_INSTANCE_TERMINATING",
+      "defaultResult": "CONTINUE",
+      "heartbeatTimeout": 300,
+      "notificationTargetARN": "arn:aws:sns:eu-north-1:123456789012:vaultsphere-lifecycle",
+      "roleARN": "arn:aws:iam::123456789012:role/vaultsphere-lifecycle-role"
+    }
+  ],
+  "warmPool": {
+    "maxGroupPreparedCapacity": 5,
+    "minSize": 0,
+    "poolState": "Stopped",
+    "instanceReusePolicy": {
+      "reuseOnScaleIn": true
+    }
+  }
+}

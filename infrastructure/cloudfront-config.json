@@ -1,0 +1,149 @@
+{
+  "distribution": {
+    "callerReference": "vaultsphere-frontend-2024",
+    "comment": "VaultSphere Frontend CDN Distribution",
+    "enabled": true,
+    "priceClass": "PriceClass_100",
+    "httpVersion": "http2",
+    "isIPV6Enabled": true,
+    "origins": [
+      {
+        "id": "vaultsphere-s3-origin",
+        "domainName": "vaultsphere-frontend.s3.eu-north-1.amazonaws.com",
+        "s3OriginConfig": {
+          "originAccessIdentity": "origin-access-identity/cloudfront/E1234567890123"
+        }
+      },
+      {
+        "id": "vaultsphere-api-origin",
+        "domainName": "api.vaultsphere.com",
+        "customOriginConfig": {
+          "httpPort": 80,
+          "httpsPort": 443,
+          "originProtocolPolicy": "https-only",
+          "originSslProtocols": ["TLSv1.2"]
+        }
+      }
+    ],
+    "defaultCacheBehavior": {
+      "targetOriginId": "vaultsphere-s3-origin",
+      "viewerProtocolPolicy": "redirect-to-https",
+      "compress": true,
+      "cachePolicyId": "4135ea2d-6df8-44a3-9df3-4b5a84be39ad",
+      "originRequestPolicyId": "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf",
+      "responseHeadersPolicyId": "5cc3b908-e619-4b99-88e5-2cf7f45965bd"
+    },
+    "cacheBehaviors": [
+      {
+        "pathPattern": "/api/*",
+        "targetOriginId": "vaultsphere-api-origin",
+        "viewerProtocolPolicy": "https-only",
+        "compress": true,
+        "cachePolicyId": "4135ea2d-6df8-44a3-9df3-4b5a84be39ad",
+        "originRequestPolicyId": "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf",
+        "responseHeadersPolicyId": "5cc3b908-e619-4b99-88e5-2cf7f45965bd",
+        "allowedMethods": ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"],
+        "cachedMethods": ["GET", "HEAD", "OPTIONS"]
+      },
+      {
+        "pathPattern": "/static/*",
+        "targetOriginId": "vaultsphere-s3-origin",
+        "viewerProtocolPolicy": "redirect-to-https",
+        "compress": true,
+        "cachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6",
+        "ttl": {
+          "defaultTTL": 86400,
+          "maxTTL": 31536000
+        }
+      }
+    ],
+    "customErrorResponses": [
+      {
+        "errorCode": 404,
+        "responsePagePath": "/index.html",
+        "responseCode": "200",
+        "errorCachingMinTTL": 300
+      },
+      {
+        "errorCode": 403,
+        "responsePagePath": "/index.html",
+        "responseCode": "200",
+        "errorCachingMinTTL": 300
+      }
+    ],
+    "aliases": [
+      "vaultsphere.com",
+      "www.vaultsphere.com"
+    ],
+    "viewerCertificate": {
+      "acmCertificateArn": "arn:aws:acm:us-east-1:ACCOUNT_ID:certificate/certificate-id",
+      "sslSupportMethod": "sni-only",
+      "minimumProtocolVersion": "TLSv1.2_2021"
+    },
+    "webACLId": "arn:aws:wafv2:us-east-1:ACCOUNT_ID:global/webacl/vaultsphere-waf/12345678-1234-1234-1234-123456789012",
+    "logging": {
+      "enabled": true,
+      "bucket": "vaultsphere-cloudfront-logs.s3.amazonaws.com",
+      "prefix": "access-logs/",
+      "includeCookies": false
+    },
+    "tags": [
+      {
+        "key": "Environment",
+        "value": "production"
+      },
+      {
+        "key": "Application",
+        "value": "VaultSphere"
+      },
+      {
+        "key": "Component",
+        "value": "CDN"
+      }
+    ]
+  },
+  "cachePolicies": {
+    "apiCachePolicy": {
+      "name": "VaultSphere-API-Cache-Policy",
+      "comment": "Cache policy for API endpoints",
+      "defaultTTL": 0,
+      "maxTTL": 86400,
+      "minTTL": 0,
+      "parametersInCacheKeyAndForwardedToOrigin": {
+        "enableAcceptEncodingGzip": true,
+        "enableAcceptEncodingBrotli": true,
+        "queryStringsConfig": {
+          "queryStringBehavior": "whitelist",
+          "queryStrings": ["page", "limit", "sort"]
+        },
+        "headersConfig": {
+          "headerBehavior": "whitelist",
+          "headers": ["Authorization", "Content-Type"]
+        },
+        "cookiesConfig": {
+          "cookieBehavior": "none"
+        }
+      }
+    },
+    "staticCachePolicy": {
+      "name": "VaultSphere-Static-Cache-Policy",
+      "comment": "Cache policy for static assets",
+      "defaultTTL": 86400,
+      "maxTTL": 31536000,
+      "minTTL": 1,
+      "parametersInCacheKeyAndForwardedToOrigin": {
+        "enableAcceptEncodingGzip": true,
+        "enableAcceptEncodingBrotli": true,
+        "queryStringsConfig": {
+          "queryStringBehavior": "none"
+        },
+        "headersConfig": {
+          "headerBehavior": "none"
+        },
+        "cookiesConfig": {
+          "cookieBehavior": "none"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,105 @@
+{
+    "CallerReference": "vaultsphere-production-20250926-030500",
+    "Comment": "VaultSphere Production CDN Distribution",
+    "DefaultRootObject": "index.html",
+    "Origins": {
+        "Quantity": 1,
+        "Items": [
+            {
+                "Id": "vaultsphere-alb-origin",
+                "DomainName": "vaultsphere-alb-723019547.eu-north-1.elb.amazonaws.com",
+                "CustomOriginConfig": {
+                    "HTTPPort": 80,
+                    "HTTPSPort": 443,
+                    "OriginProtocolPolicy": "http-only",
+                    "OriginSslProtocols": {
+                        "Quantity": 3,
+                        "Items": ["TLSv1", "TLSv1.1", "TLSv1.2"]
+                    },
+                    "OriginReadTimeout": 30,
+                    "OriginKeepaliveTimeout": 5
+                }
+            }
+        ]
+    },
+    "DefaultCacheBehavior": {
+        "TargetOriginId": "vaultsphere-alb-origin",
+        "ViewerProtocolPolicy": "redirect-to-https",
+        "MinTTL": 0,
+        "ForwardedValues": {
+            "QueryString": true,
+            "Cookies": {
+                "Forward": "all"
+            },
+            "Headers": {
+                "Quantity": 4,
+                "Items": ["Authorization", "Content-Type", "Accept", "User-Agent"]
+            }
+        },
+        "TrustedSigners": {
+            "Enabled": false,
+            "Quantity": 0
+        },
+        "Compress": true,
+        "SmoothStreaming": false
+    },
+    "CacheBehaviors": {
+        "Quantity": 2,
+        "Items": [
+            {
+                "PathPattern": "/api/*",
+                "TargetOriginId": "vaultsphere-alb-origin",
+                "ViewerProtocolPolicy": "https-only",
+                "MinTTL": 0,
+                "DefaultTTL": 0,
+                "MaxTTL": 0,
+                "ForwardedValues": {
+                    "QueryString": true,
+                    "Cookies": {
+                        "Forward": "all"
+                    },
+                    "Headers": {
+                        "Quantity": 6,
+                        "Items": ["Authorization", "Content-Type", "Accept", "User-Agent", "X-Forwarded-For", "CloudFront-Forwarded-Proto"]
+                    }
+                },
+                "TrustedSigners": {
+                    "Enabled": false,
+                    "Quantity": 0
+                },
+                "Compress": false,
+                "SmoothStreaming": false
+            },
+            {
+                "PathPattern": "/static/*",
+                "TargetOriginId": "vaultsphere-alb-origin",
+                "ViewerProtocolPolicy": "https-only",
+                "MinTTL": 86400,
+                "DefaultTTL": 86400,
+                "MaxTTL": 31536000,
+                "ForwardedValues": {
+                    "QueryString": false,
+                    "Cookies": {
+                        "Forward": "none"
+                    }
+                },
+                "TrustedSigners": {
+                    "Enabled": false,
+                    "Quantity": 0
+                },
+                "Compress": true,
+                "SmoothStreaming": false
+            }
+        ]
+    },
+    "Enabled": true,
+    "PriceClass": "PriceClass_All",
+    "HttpVersion": "http2",
+    "IsIPV6Enabled": true,
+    "Logging": {
+        "Enabled": true,
+        "IncludeCookies": false,
+        "Bucket": "vaultsphere-cloudfront-logs.s3.amazonaws.com",
+        "Prefix": "access-logs/"
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "serviceName": "vaultsphere-backend-service",
+    "cluster": "vaultsphere-cluster",
+    "taskDefinition": "vaultsphere-backend-task:2",
+    "desiredCount": 3,
+    "launchType": "FARGATE",
+    "networkConfiguration": {
+        "awsvpcConfiguration": {
+            "subnets": [
+                "subnet-02c0a927622855c14",
+                "subnet-08e8b53f96f37b324",
+                "subnet-0875a41b8f6707937"
+            ],
+            "securityGroups": [
+                "sg-09ea3fb1f6f4c2c21"
+            ],
+            "assignPublicIp": "ENABLED"
+        }
+    },
+    "loadBalancers": [
+        {
+            "targetGroupArn": "arn:aws:elasticloadbalancing:eu-north-1:687450791196:targetgroup/vaultsphere-backend-tg/5e7b1a5855fcf1f2",
+            "containerName": "vaultsphere-backend",
+            "containerPort": 5000
+        }
+    ],
+    "healthCheckGracePeriodSeconds": 300,
+    "tags": [
+        {
+            "key": "Environment",
+            "value": "production"
+        },
+        {
+            "key": "Application",
+            "value": "VaultSphere"
+        }
+    ]
+}
