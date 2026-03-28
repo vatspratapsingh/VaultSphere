@@ -135,21 +135,23 @@ VaultSphere/
 │   │   │   ├── dashboards/  # Role-based dashboards
 │   │   │   └── TasksDashboard.js
 │   │   ├── contexts/        # React contexts
-│   │   └── App.js          # Main application
+│   │   └── App.js           # Main application
 │   └── package.json
 ├── backend/                  # Express.js server
 │   ├── routes/              # API routes
-│   ├── config/              # Database configuration
-│   ├── database/            # SQL scripts
+│   ├── config/              # Database & cloud configuration
+│   ├── database/            # SQL scripts and migrations
+│   ├── middleware/          # Auth, security & rate limiting
 │   ├── scripts/             # Database initialization
-│   └── server.js           # Main server file
-├── terraform/               # AWS infrastructure
-│   ├── main.tf             # Main Terraform configuration
-│   ├── variables.tf        # Variable definitions
-│   └── terraform.tfvars    # Variable values
-├── scripts/                 # Deployment scripts
+│   └── server.js            # Main server file
+├── infrastructure/          # AWS infrastructure configs
+│   ├── terraform/           # Terraform IaC files
+│   ├── ecs-task-definition.json
+│   └── k8s-deployment.yaml
+├── scripts/                 # Deployment & CI scripts
+├── docs/                    # Project documentation
 ├── .github/workflows/       # CI/CD pipeline
-└── README.md               # This file
+└── README.md                # This file
 ```
 
 ## 🚀 Quick Start
@@ -160,28 +162,13 @@ VaultSphere/
 - AWS CLI configured
 - Git
 
-### **Quick Start (Mock Mode - No DB Required)**
-This is the fastest way to get the project running locally without setting up a PostgreSQL database.
-
+### **1. Clone the Repository**
 ```bash
-# Clone the repository
 git clone https://github.com/vatspratapsingh/VaultSphere.git
 cd VaultSphere
-
-# Run the automated startup script
-./start-local.sh
 ```
 
-The startup script will:
-1.  Clean up any existing processes
-2.  Start the backend in mock mode (port 5001)
-3.  Start the frontend (port 3000)
-4.  Provide demo credentials for testing
-
-### **Standard Setup (With Database)**
-If you want to use a live PostgreSQL database:
-
-### **1. Backend Setup**
+### **2. Backend Setup**
 ```bash
 cd backend
 npm install
@@ -220,12 +207,12 @@ aws s3 sync build/ s3://your-bucket-name --delete
 ### **Backend (AWS EC2)**
 ```bash
 # Use the deployment script
-./scripts/deploy-backend.sh
+./scripts/deploy.sh
 ```
 
 ### **Infrastructure (Terraform)**
 ```bash
-cd terraform
+cd infrastructure/terraform
 terraform init
 terraform plan
 terraform apply
