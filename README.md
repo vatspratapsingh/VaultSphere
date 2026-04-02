@@ -20,17 +20,6 @@ VaultSphere is a complete, production-ready multi-tenant SaaS platform that demo
 - **🛡️ Enterprise Security**: Multi-factor authentication, data encryption, and audit trails
 - **🌍 Global Ready**: CDN, multi-region deployment, and internationalization support
 
-## 🎨 Screenshots
-
-### Dashboard Overview
-![Dashboard Screenshot](https://via.placeholder.com/800x450/1f2937/ffffff?text=VaultSphere+Dashboard)
-
-### Analytics Dashboard
-![Analytics Screenshot](https://via.placeholder.com/800x450/1f2937/ffffff?text=ML+Analytics+Dashboard)
-
-### Multi-Tenant Architecture
-![Architecture Screenshot](https://via.placeholder.com/800x450/1f2937/ffffff?text=Multi-Tenant+Architecture)
-
 ## 🔥 Features
 
 ### ✅ **Core Platform Features**
@@ -409,10 +398,6 @@ stages:
 - **📊 Audit Logs**: Comprehensive activity tracking
 - **🔒 Compliance**: SOC 2, GDPR ready
 
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
 ### **Development Workflow**
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -434,12 +419,6 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 - **🔧 [Development Guide](docs/development.md)** - Local development setup
 - **📊 [Monitoring Guide](docs/monitoring.md)** - Observability setup
 
-## 🏆 Awards & Recognition
-
-- 🥇 **ICS-CPS 2026 Conference Presentation**
-- 🏆 **Best Paper Award** - Multi-tenant security architecture
-- 🌟 **GitHub Star Project** - Community recognition
-
 ## 👨‍💻 Authors
 
 - **Vats Pratap Singh** - [GitHub](https://github.com/vatspratapsingh)
@@ -447,9 +426,6 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
   - ML model integration
   - Cloud infrastructure design
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
