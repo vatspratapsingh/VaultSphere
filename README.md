@@ -20,14 +20,6 @@ VaultSphere is a complete, production-ready multi-tenant SaaS platform that demo
 - **🛡️ Enterprise Security**: Multi-factor authentication, data encryption, and audit trails
 - **🌍 Global Ready**: CDN, multi-region deployment, and internationalization support
 
-## 🌐 Live Demo
-
-| Environment | URL | Status |
-|-------------|-----|--------|
-| **Frontend** | [vaultsphere-frontend-2024-vats.s3-website.eu-north-1.amazonaws.com](http://vaultsphere-frontend-2024-vats.s3-website.eu-north-1.amazonaws.com) | 🟢 Live |
-| **Backend API** | [api.vaultsphere.cloud](https://api.vaultsphere.cloud) | 🟢 Live |
-| **Local Development** | [localhost:3000](http://localhost:3000) | 🟡 Local |
-
 ## 🎨 Screenshots
 
 ### Dashboard Overview
