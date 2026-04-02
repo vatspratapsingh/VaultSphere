@@ -411,13 +411,6 @@ stages:
 - **✅ Write tests for new features**
 - **📝 Update documentation for API changes**
 
-## 📚 Documentation
-
-- **📖 [API Documentation](docs/api.md)** - Complete API reference
-- **🏗️ [Architecture Guide](docs/architecture.md)** - System design details
-- **🚀 [Deployment Guide](docs/deployment.md)** - Production setup
-- **🔧 [Development Guide](docs/development.md)** - Local development setup
-- **📊 [Monitoring Guide](docs/monitoring.md)** - Observability setup
 
 ## 👨‍💻 Authors
 
